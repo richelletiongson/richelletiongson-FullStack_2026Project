@@ -1,0 +1,4 @@
+node_modules/
+database/horoscope.db
+.env
+*.log

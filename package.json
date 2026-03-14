@@ -1,0 +1,12 @@
+{
+  "name": "horoscope-2026",
+  "version": "1.0.0",
+  "description": "Horoscope predicting website with SQL database",
+  "scripts": {
+    "db:init": "node database/init-db.js",
+    "db:query": "node database/query-db.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.6.0"
+  }
+}
