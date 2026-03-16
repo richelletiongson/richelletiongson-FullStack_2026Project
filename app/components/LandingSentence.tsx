@@ -73,7 +73,9 @@ export default function LandingSentence({ months }: { months: Month[] }) {
           className="prettySelect"
         >
           <option value="">month</option>
-          {months.map((m) => (
+          {months
+            .filter((m) => m.month_id >= 3)
+            .map((m) => (
             <option key={m.month_id} value={m.month_id}>{m.name}</option>
           ))}
         </select>
