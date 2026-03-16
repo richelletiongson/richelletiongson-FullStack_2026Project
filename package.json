@@ -4,9 +4,26 @@
   "description": "Horoscope predicting website with SQL database",
   "scripts": {
     "db:init": "node database/init-db.js",
-    "db:query": "node database/query-db.js"
+    "db:query": "node database/query-db.js",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "better-sqlite3": "^11.6.0"
+    "better-sqlite3": "^11.6.0",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0"
   }
 }
