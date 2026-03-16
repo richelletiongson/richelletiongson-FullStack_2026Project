@@ -20,7 +20,7 @@ type Props = {
 type Playhead = { offset: number };
 
 const spacing = 0.12;
-const defaultAccents = ['#cdb4ff', '#ffe08a', '#ffb3d9'] as const;
+const defaultAccents = ['#cdb4ff', '#ffe08a', '#ffb3d9', '#9a7cf6'] as const;
 
 function buildSeamlessLoop(
   items: Element[],
