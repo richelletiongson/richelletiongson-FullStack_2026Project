@@ -14,12 +14,54 @@
       </div>
       <div class="landing-row">
         <span class="text">Category:</span>
-        <select name="category" required class="prettySelect">
-          <option value="">choose category</option>
-          <% categories.forEach(function(c) { %>
-            <option value="<%= c.value %>"><%= c.label %></option>
-          <% }); %>
-        </select>
+      </div>
+
+      <!-- Hidden native select used for form submission; kept in sync with slider -->
+      <select
+        name="category"
+        required
+        class="prettySelect"
+        style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;"
+      >
+        <% categories.forEach(function(c) { %>
+          <option value="<%= c.value %>"><%= c.label %></option>
+        <% }); %>
+      </select>
+
+      <!-- Pretty static category cards -->
+      <div style="width:100%;margin-top:1.75rem;">
+        <div class="ccs-root" aria-label="Choose a category" data-selected="">
+          <div class="ccs-gallery" role="group" aria-roledescription="carousel">
+            <ul class="ccs-cards" aria-label="Categories">
+              <% categories.forEach(function(c, idx) { %>
+                <li
+                  class="ccs-card"
+                  data-value="<%= c.value %>"
+                  style="--ccs-accent: <%= c.accent || ['#cdb4ff','#ffe08a','#ffb3d9','#9a7cf6'][idx % 4] %>;"
+                >
+                  <button
+                    type="button"
+                    class="ccs-cardButton"
+                    aria-pressed="false"
+                  >
+                    <span class="ccs-cardLabel"><%= c.label %></span>
+                    <% if (c.description) { %>
+                      <span class="ccs-cardDesc"><%= c.description %></span>
+                    <% } %>
+                  </button>
+                </li>
+              <% }); %>
+            </ul>
+            <div class="ccs-actions" aria-label="Slider controls">
+              <button type="button" class="ccs-navBtn" data-dir="prev" aria-label="Previous">
+                ←
+              </button>
+              <button type="button" class="ccs-navBtn" data-dir="next" aria-label="Next">
+                →
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="landing-row">
         <span class="text">in</span>
