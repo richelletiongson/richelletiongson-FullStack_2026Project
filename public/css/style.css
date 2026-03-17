@@ -1,0 +1,284 @@
+/* Horoscope 2026 – Express + EJS styles */
+:root {
+  --bg: #0c0818;
+  --surface: #1a1925;
+  --surface-hover: #242230;
+  --text: #e8e6f0;
+  --text-muted: #9a97a8;
+  --accent: #b899fc;
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  background: radial-gradient(
+    circle at 50% 30%,
+    #2b1a66 0%,
+    #1a1236 32%,
+    #0c0818 60%,
+    #050309 82%,
+    #000 100%
+  );
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Page structure */
+.page-main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.page-wrap {
+  width: 100%;
+  max-width: 42rem;
+}
+
+.page-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-bottom: 2rem;
+}
+
+.landing-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 1.125rem;
+}
+
+.landing-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.landing-row .text {
+  color: var(--text);
+}
+
+/* Select */
+.prettySelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-radius: 999px;
+  padding: 10px 44px 10px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.25) inset;
+  transition: border-color 180ms ease, box-shadow 220ms ease, transform 180ms ease;
+  line-height: 1.2;
+  font-size: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath fill='white' fill-opacity='0.9' d='M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px 18px;
+}
+
+.prettySelect:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.prettySelect:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.45), 0 0 0 3px rgba(184, 153, 252, 0.45);
+}
+
+.prettySelect option {
+  background: #141221;
+  color: #fff;
+}
+
+/* Button */
+.forecastBtn {
+  position: relative;
+  border-radius: 999px;
+  padding: 12px 18px;
+  border: 1px solid rgba(184, 153, 252, 0.55);
+  background: linear-gradient(135deg, #c4b0ff, var(--accent));
+  color: #0f0e17;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.25) inset;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 220ms ease, filter 220ms ease;
+  overflow: hidden;
+}
+
+.forecastBtn:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.05);
+  box-shadow: 0 14px 36px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,0,0,0.25) inset;
+}
+
+.forecastBtn:active {
+  transform: translateY(0);
+}
+
+.forecastBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Sign links below form */
+.sign-links {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.sign-link {
+  color: var(--accent);
+}
+
+.sign-link:hover {
+  text-decoration: underline;
+}
+
+/* Forecast page */
+.forecast-wrap {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.back-link {
+  display: inline-block;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.back-link:hover,
+.back-link:focus {
+  color: var(--accent);
+  outline: none;
+}
+
+.forecast-meta {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.forecast-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.forecast-card {
+  border-radius: var(--radius);
+  border: 1px solid var(--surface-hover);
+  background: var(--surface);
+  padding: 1.5rem;
+}
+
+.forecast-card--empty {
+  text-align: center;
+}
+
+.forecast-text {
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.forecast-try {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--accent);
+}
+
+.forecast-try:hover {
+  text-decoration: underline;
+}
+
+/* Sign detail page */
+.sign-wrap {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.sign-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.sign-subtitle {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.sign-months {
+  list-style: none;
+}
+
+.sign-month-card {
+  border-radius: var(--radius);
+  border: 1px solid var(--surface-hover);
+  background: var(--surface);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.sign-month-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.sign-predictions {
+  list-style: none;
+}
+
+.sign-predictions li {
+  margin-bottom: 0.75rem;
+}
+
+.sign-cat-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  display: block;
+}
+
+.sign-cat-text {
+  margin-top: 0.25rem;
+  color: var(--text);
+  line-height: 1.5;
+}

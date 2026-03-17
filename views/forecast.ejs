@@ -1,0 +1,19 @@
+<main class="page-main">
+  <div class="page-wrap forecast-wrap">
+    <nav aria-label="Back to home">
+      <a href="/" class="back-link">← Back</a>
+    </nav>
+    <% if (prediction) { %>
+      <p class="forecast-meta"><%= sign %> · <%= category %> · <%= monthName %> 2026</p>
+      <h1 class="forecast-title">Your forecast</h1>
+      <div class="forecast-card">
+        <p class="forecast-text"><%= prediction.prediction %></p>
+      </div>
+    <% } else { %>
+      <div class="forecast-card forecast-card--empty">
+        <p class="text-muted">No forecast found for that combination. Please choose your sign, category, and month on the home page.</p>
+        <a href="/" class="forecast-try">Try again</a>
+      </div>
+    <% } %>
+  </div>
+</main>
