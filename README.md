@@ -1,40 +1,66 @@
 # FullStack_2026Project — Horoscope 2026
 
-2026 星座运势网站：SQLite 数据库 + Next.js 前端。
+Horoscope 2026 website: **HTML**, **CSS**, **JavaScript**, **Express.js**, **EJS**, **Node.js**, **PostgreSQL**.
 
-## 快速开始
+## Tech stack
 
-### 1. 初始化数据库（首次运行必须执行）
+- **HTML** – structure of pages (rendered via EJS)
+- **CSS** – styling in `public/css/style.css`
+- **JavaScript** – client-side behavior; server-side via Node.js
+- **Express.js** – routing and middleware
+- **EJS** – server-side templating
+- **PostgreSQL** – database (schema in `database/schema.pg.sql`)
+
+## Quick start
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure PostgreSQL
+
+Copy `.env.example` to `.env` and set your database URL:
+
+```
+DATABASE_URL=postgresql://username:password@localhost:5432/horoscope2026
+PORT=3000
+```
+
+Create the database if needed (e.g. `createdb horoscope2026`).
+
+### 3. Initialize database (first time only)
 
 ```bash
 npm run db:init
 ```
 
-会在 `database/horoscope.db` 创建库表并导入全部星座数据（火/土/风/水四象，12 星座，3–12 月）。
+This runs `database/schema.pg.sql` and loads all seed data (fire, earth, air, water signs; March–December 2026).
 
-### 2. 启动前端
+### 4. Start the server
 
 ```bash
 npm run dev
 ```
 
-浏览器打开 [http://localhost:3000](http://localhost:3000)：首页选择星座，进入该星座的 2026 年月度运势（爱情、财富、事业、家庭、健康）。
+Open [http://localhost:3000](http://localhost:3000). Use the form to pick sign, category, and month, then view your forecast. You can also open a sign’s page from the links (e.g. `/sign/Aries`).
 
-## 脚本说明
+## Scripts
 
-| 命令 | 说明 |
-|------|------|
-| `npm run db:init` | 初始化/重建 SQLite 数据库并导入 seed |
-| `npm run db:query` | 命令行查询示例：`node database/query-db.js [sign] [month_id] [category]` |
-| `npm run dev` | 启动 Next.js 开发服务器 |
-| `npm run build` | 构建生产版本 |
-| `npm run start` | 运行生产服务器 |
+| Command | Description |
+|--------|-------------|
+| `npm run db:init` | Initialize PostgreSQL schema and load seeds |
+| `npm run dev` | Start Express server |
+| `npm start` | Same as `npm run dev` |
 
-## 项目结构
+## Project structure
 
-- `database/` — SQLite schema、seed、init/query 脚本
-- `app/` — Next.js App Router：首页、`/sign/[sign]` 星座详情
-- `app/api/` — API：`/api/signs`、`/api/months`、`/api/predictions`
-- `lib/db.ts` — 数据库连接与类型
+- `server.js` – Express app entry
+- `routes/` – Express routes (home, forecast, sign)
+- `views/` – EJS templates (layout, index, forecast, sign, 404)
+- `public/` – Static files (CSS)
+- `lib/db.js` – PostgreSQL connection and queries
+- `database/` – `schema.pg.sql`, seed files, `init-db.js`
 
-数据库说明见 [database/README.md](database/README.md)。
+The previous **Next.js + React + SQLite** version is still in the `app/` folder for reference; the running app is now Express + EJS + PostgreSQL.

@@ -1,0 +1,41 @@
+<main class="page-main">
+  <div class="page-wrap">
+    <p class="page-subtitle">Horoscope 2026</p>
+    <form action="/forecast" method="get" class="landing-form">
+      <div class="landing-row">
+        <span class="text">I'm</span>
+        <select name="sign" required class="prettySelect">
+          <option value="">choose sign</option>
+          <% signs.forEach(function(s) { %>
+            <option value="<%= s %>"><%= s %></option>
+          <% }); %>
+        </select>
+        <span class="text">, and I'd love to know what the stars have in store for my</span>
+      </div>
+      <div class="landing-row">
+        <span class="text">Category:</span>
+        <select name="category" required class="prettySelect">
+          <option value="">choose category</option>
+          <% categories.forEach(function(c) { %>
+            <option value="<%= c.value %>"><%= c.label %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="landing-row">
+        <span class="text">in</span>
+        <select name="month_id" required class="prettySelect">
+          <option value="">month</option>
+          <% months.forEach(function(m) { %>
+            <option value="<%= m.month_id %>"><%= m.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <button type="submit" class="forecastBtn">See my forecast</button>
+    </form>
+    <p class="sign-links">
+      <% signs.forEach(function(s, i) { %>
+        <a href="/sign/<%= encodeURIComponent(s) %>" class="sign-link"><%= s %></a><%= i < signs.length - 1 ? ' · ' : '' %>
+      <% }); %>
+    </p>
+  </div>
+</main>

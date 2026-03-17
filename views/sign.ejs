@@ -1,0 +1,26 @@
+<main class="page-main">
+  <div class="page-wrap sign-wrap">
+    <nav aria-label="Back to home">
+      <a href="/" class="back-link">← Back</a>
+    </nav>
+    <h1 class="sign-title"><%= sign %> · 2026</h1>
+    <p class="sign-subtitle">Monthly forecasts by category</p>
+    <ul class="sign-months">
+      <% byMonth.forEach(function(month) { %>
+        <li class="sign-month-card">
+          <h2 class="sign-month-name"><%= month.monthName %></h2>
+          <ul class="sign-predictions">
+            <% categories.forEach(function(cat) { %>
+              <% if (month.byCategory[cat]) { %>
+                <li>
+                  <span class="sign-cat-label"><%= cat %></span>
+                  <p class="sign-cat-text"><%= month.byCategory[cat] %></p>
+                </li>
+              <% } %>
+            <% }); %>
+          </ul>
+        </li>
+      <% }); %>
+    </ul>
+  </div>
+</main>
