@@ -10,11 +10,11 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.21.0",
     "express-ejs-layouts": "^2.5.1",
-    "pg": "^8.13.0",
-    "dotenv": "^16.4.5"
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "eslint": "^8.57.0"

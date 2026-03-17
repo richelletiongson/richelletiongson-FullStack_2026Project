@@ -1,52 +1,63 @@
-#!/usr/bin/env node
-/**
- * Example query script. Usage:
- *   node database/query-db.js [sign] [month_id] [category]
- * Examples:
- *   node database/query-db.js Aries 3
- *   node database/query-db.js Leo 7 Love
- */
-const path = require('path');
-const dbPath = path.join(__dirname, 'horoscope.db');
+require("dotenv").config();
+const { Pool } = require("pg");
+
+const pool = new Pool({
+    connectionString:
+        process.env.DATABASE_URL ||
+        process.env.POSTGRES_URL ||
+        "postgres://postgres:postgres@localhost:5432/horoscope2026",
+});
 
 async function query() {
-  let Database;
-  try {
-    Database = (await import('better-sqlite3')).default;
-  } catch (e) {
-    console.error('Run: npm install better-sqlite3');
-    process.exit(1);
-  }
+    const [sign, monthId, category] = process.argv.slice(2);
 
-  const db = new Database(dbPath, { readonly: true });
-  const [sign, monthId, category] = process.argv.slice(2);
+    let result;
 
-  let stmt, rows;
-  if (sign && monthId && category) {
-    stmt = db.prepare(
-      'SELECT prediction FROM zodiac_predictions_2026 WHERE sign = ? AND month_id = ? AND category = ?'
-    );
-    rows = stmt.all(sign, parseInt(monthId, 10), category);
-  } else if (sign && monthId) {
-    stmt = db.prepare(
-      'SELECT category, prediction FROM zodiac_predictions_2026 WHERE sign = ? AND month_id = ? ORDER BY category'
-    );
-    rows = stmt.all(sign, parseInt(monthId, 10));
-  } else if (sign) {
-    stmt = db.prepare(
-      'SELECT month_id, category, prediction FROM zodiac_predictions_2026 WHERE sign = ? ORDER BY month_id, category'
-    );
-    rows = stmt.all(sign);
-  } else {
-    stmt = db.prepare('SELECT sign, COUNT(*) AS count FROM zodiac_predictions_2026 GROUP BY sign');
-    rows = stmt.all();
-  }
+    if (sign && monthId && category) {
+        result = await pool.query(
+            `
+      SELECT prediction
+      FROM zodiac_predictions_2026
+      WHERE sign = $1 AND month_id = $2 AND category = $3
+      `,
+            [sign, parseInt(monthId, 10), category],
+        );
+    } else if (sign && monthId) {
+        result = await pool.query(
+            `
+      SELECT category, prediction
+      FROM zodiac_predictions_2026
+      WHERE sign = $1 AND month_id = $2
+      ORDER BY category
+      `,
+            [sign, parseInt(monthId, 10)],
+        );
+    } else if (sign) {
+        result = await pool.query(
+            `
+      SELECT month_id, category, prediction
+      FROM zodiac_predictions_2026
+      WHERE sign = $1
+      ORDER BY month_id, category
+      `,
+            [sign],
+        );
+    } else {
+        result = await pool.query(
+            `
+      SELECT sign, COUNT(*) AS count
+      FROM zodiac_predictions_2026
+      GROUP BY sign
+      ORDER BY sign
+      `,
+        );
+    }
 
-  console.log(JSON.stringify(rows, null, 2));
-  db.close();
+    console.log(JSON.stringify(result.rows, null, 2));
+    await pool.end();
 }
 
 query().catch((err) => {
-  console.error(err);
-  process.exit(1);
+    console.error(err);
+    process.exit(1);
 });
