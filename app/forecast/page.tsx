@@ -22,8 +22,8 @@ export default async function ForecastPage({ searchParams }: Props) {
       : null;
 
   return (
-    <main className="min-h-screen bg-[var(--bg)]">
-      <div className="mx-auto max-w-2xl px-4 py-10">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="w-full max-w-2xl">
         <nav className="mb-8" aria-label="Back to home">
           <a href="/" className={backLinkClass}>
             ← Back

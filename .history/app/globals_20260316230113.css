@@ -15,8 +15,8 @@
     --air: #7eb8da;
     --water: #5b8fb9;
     --radius: 12px;
-    --font-sans: var(--font-sans), system-ui, sans-serif;
-    --font-display: var(--font-display), var(--font-sans);
+    --font-sans: Arial, system-ui, sans-serif;
+    --font-display: Arial, system-ui, sans-serif;
 }
 
 * {
@@ -110,7 +110,8 @@ body {
     );
     background-color: var(--bg);
     color: var(--text);
-    font-family: var(--font-sans);
+    font-family: Arial, system-ui, sans-serif;
+    font-size: 10px;
     -webkit-font-smoothing: antialiased;
 }
 

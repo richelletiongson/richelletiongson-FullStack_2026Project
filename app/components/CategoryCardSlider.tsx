@@ -1,8 +1,7 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import gsap from 'gsap';
-import { Draggable } from 'gsap/all';
 
 type Category = {
   value: string;
@@ -17,197 +16,78 @@ type Props = {
   onSelect: (value: string) => void;
 };
 
-type Playhead = { offset: number };
-
-const spacing = 0.12;
 const defaultAccents = ['#cdb4ff', '#ffe08a', '#ffb3d9', '#9a7cf6'] as const;
 
-function buildSeamlessLoop(
-  items: Element[],
-  itemSpacing: number,
-  animateFunc: (el: Element) => gsap.core.Timeline
-) {
-  const overlap = Math.ceil(1 / itemSpacing);
-  const startTime = items.length * itemSpacing + 0.5;
-  const loopTime = (items.length + overlap) * itemSpacing + 1;
+function normalizeKey(value: string) {
+  return value.trim().toLowerCase();
+}
 
-  const rawSequence = gsap.timeline({ paused: true });
-  const seamlessLoop = gsap.timeline({
-    paused: true,
-    repeat: -1,
-    onRepeat() {
-      // Workaround rare edge case in older GSAP; harmless now.
-      const t = this as unknown as { _time: number; _dur: number; _tTime: number };
-      if (t._time === t._dur) t._tTime += t._dur - 0.01;
-    },
-  });
-
-  const l = items.length + overlap * 2;
-  for (let i = 0; i < l; i += 1) {
-    const index = i % items.length;
-    const time = i * itemSpacing;
-    rawSequence.add(animateFunc(items[index]), time);
-    if (i <= items.length) seamlessLoop.add(`label${i}`, time);
-  }
-
-  rawSequence.time(startTime);
-  seamlessLoop
-    .to(rawSequence, {
-      time: loopTime,
-      duration: loopTime - startTime,
-      ease: 'none',
-    })
-    .fromTo(
-      rawSequence,
-      { time: overlap * itemSpacing + 1 },
-      {
-        time: startTime,
-        duration: startTime - (overlap * itemSpacing + 1),
-        immediateRender: false,
-        ease: 'none',
-      }
-    );
-
-  return seamlessLoop;
+function getCategoryImageSrc(categoryValue: string) {
+  const key = normalizeKey(categoryValue);
+  const map: Record<string, string> = {
+    love: '/images/Love.png',
+    health: '/images/Health.png',
+    family: '/images/Family.png',
+    career: '/images/Career.png',
+    money: '/images/Money.png',
+  };
+  return map[key] ?? null;
 }
 
 export default function CategoryCardSlider({ categories, selectedValue, onSelect }: Props) {
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const proxyRef = useRef<HTMLDivElement | null>(null);
-  const scrollToOffsetRef = useRef<((offset: number) => void) | null>(null);
-  const currentOffsetRef = useRef(0);
-  const categoriesRef = useRef(categories);
-  const onSelectRef = useRef(onSelect);
-  const lastSelectedRef = useRef<string | null>(null);
+  const listRef = useRef<HTMLUListElement | null>(null);
+  const itemRefs = useRef<(HTMLLIElement | null)[]>([]);
 
-  categoriesRef.current = categories;
-  onSelectRef.current = onSelect;
+  const selectedIndex = useMemo(() => {
+    const idx = categories.findIndex((c) => c.value === selectedValue);
+    return idx >= 0 ? idx : 0;
+  }, [categories, selectedValue]);
 
-  // Duplicate the list once so the loop feels richer with only 5 cards.
-  const loopCategories = useMemo(() => [...categories, ...categories], [categories]);
+  const scrollToIndex = useCallback(
+    (idx: number, behavior: ScrollBehavior = 'smooth') => {
+      const item = itemRefs.current[idx];
+      if (!item) return;
+      item.scrollIntoView({ behavior, block: 'nearest', inline: 'center' });
+    },
+    []
+  );
 
   useEffect(() => {
-    if (!rootRef.current || !proxyRef.current) return;
-
-    gsap.registerPlugin(Draggable);
-
-    const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray('.ccs-cards li', rootRef.current) as HTMLElement[];
-      if (cards.length === 0) return;
-
-      // Smaller travel range so side cards remain more visible.
-      gsap.set(cards, { xPercent: 320, opacity: 0, scale: 0 });
-
-      const animateFunc = (element: Element) => {
-        const tl = gsap.timeline();
-        tl.fromTo(
-          element,
-          { scale: 0, opacity: 0 },
-          {
-            scale: 1,
-            opacity: 1,
-            zIndex: 100,
-            duration: 0.5,
-            yoyo: true,
-            repeat: 1,
-            ease: 'power1.in',
-            immediateRender: false,
-          }
-        ).fromTo(
-          element,
-          { xPercent: 320 },
-          { xPercent: -320, duration: 1, ease: 'none', immediateRender: false },
-          0
-        );
-        return tl;
-      };
-
-      const seamlessLoop = buildSeamlessLoop(cards, spacing, animateFunc);
-      const playhead: Playhead = { offset: 0 };
-      const wrapTime = gsap.utils.wrap(0, seamlessLoop.duration());
-      const snapTime = gsap.utils.snap(spacing);
-
-      const scrub = gsap.to(playhead, {
-        offset: 0,
-        onUpdate() {
-          seamlessLoop.time(wrapTime(playhead.offset));
-          currentOffsetRef.current = playhead.offset;
-          // Find the visually largest card and mark it as selected.
-          let maxScale = -Infinity;
-          let maxIndex = 0;
-          cards.forEach((card, index) => {
-            const s = Number(gsap.getProperty(card, 'scale') || 0);
-            if (s > maxScale) {
-              maxScale = s;
-              maxIndex = index;
-            }
-          });
-
-          cards.forEach((card, index) => {
-            card.classList.toggle('ccs-card--selected', index === maxIndex);
-          });
-
-          const baseCategories = categoriesRef.current;
-          const selectCb = onSelectRef.current;
-          if (baseCategories && baseCategories.length > 0 && selectCb) {
-            const logicalIndex = maxIndex % baseCategories.length;
-            const nextValue = baseCategories[logicalIndex]?.value;
-            if (nextValue && nextValue !== lastSelectedRef.current) {
-              lastSelectedRef.current = nextValue;
-              selectCb(nextValue);
-            }
-          }
-        },
-        duration: 0.45,
-        ease: 'power3',
-        paused: true,
-      });
-
-      const scrollToOffset = (offset: number) => {
-        scrub.vars.offset = snapTime(offset);
-        scrub.invalidate().restart();
-      };
-      scrollToOffsetRef.current = scrollToOffset;
-
-      Draggable.create(proxyRef.current!, {
-        type: 'x',
-        trigger: rootRef.current!.querySelector('.ccs-cards') as Element,
-        onPress: function onPress() {
-          currentOffsetRef.current = scrub.vars.offset;
-        },
-        onDrag: function onDrag() {
-          const d = this as unknown as { startX: number; x: number };
-          scrub.vars.offset = currentOffsetRef.current + (d.startX - d.x) * 0.0012;
-          scrub.invalidate().restart();
-        },
-        onDragEnd: function onDragEnd() {
-          scrollToOffset(scrub.vars.offset);
-        },
-      });
-    }, rootRef);
-
-    return () => ctx.revert();
-  }, []);
+      // Keep the selected card centered.
+      scrollToIndex(selectedIndex, 'auto');
+  }, [scrollToIndex, selectedIndex]);
 
   const handlePrev = useCallback(() => {
-    scrollToOffsetRef.current?.(currentOffsetRef.current - spacing);
-  }, []);
+    const nextIndex = (selectedIndex - 1 + categories.length) % categories.length;
+    onSelect(categories[nextIndex]!.value);
+    scrollToIndex(nextIndex);
+  }, [categories, onSelect, scrollToIndex, selectedIndex]);
 
   const handleNext = useCallback(() => {
-    scrollToOffsetRef.current?.(currentOffsetRef.current + spacing);
-  }, []);
+    const nextIndex = (selectedIndex + 1) % categories.length;
+    onSelect(categories[nextIndex]!.value);
+    scrollToIndex(nextIndex);
+  }, [categories, onSelect, scrollToIndex, selectedIndex]);
 
   return (
-    <div ref={rootRef} className="ccs-root" aria-label="Choose a category">
+    <div className="ccs-root" aria-label="Choose a category">
       <div className="ccs-gallery" role="group" aria-roledescription="carousel">
-        <ul className="ccs-cards" aria-label="Categories">
-          {loopCategories.map((c, idx) => {
+        <button type="button" className="ccs-navBtn" onClick={handlePrev} aria-label="Previous">
+          ←
+        </button>
+        <ul ref={listRef} className="ccs-cards" aria-label="Categories">
+          {categories.map((c, idx) => {
+            const isSelected = idx === selectedIndex;
             const fallbackAccent = defaultAccents[idx % defaultAccents.length];
+            const imgSrc = getCategoryImageSrc(c.value);
             return (
               <li
                 key={`${c.value}-${idx}`}
                 data-value={c.value}
-                className="ccs-card"
+                className={`ccs-card ${isSelected ? 'ccs-card--selected' : ''}`}
+                ref={(el) => {
+                  itemRefs.current[idx] = el;
+                }}
                 style={
                   {
                     // CSS custom props so styling stays in CSS.
@@ -219,27 +99,24 @@ export default function CategoryCardSlider({ categories, selectedValue, onSelect
                   type="button"
                   className="ccs-cardButton"
                   onClick={() => onSelect(c.value)}
-                  aria-pressed={selectedValue === c.value}
+                  aria-pressed={isSelected}
                 >
-                  <span className="ccs-cardLabel">{c.label}</span>
-                  {c.description ? <span className="ccs-cardDesc">{c.description}</span> : null}
+                  {imgSrc ? (
+                    <span className="ccs-cardImageWrap" aria-hidden="true">
+                      <Image src={imgSrc} alt="" fill sizes="220px" className="ccs-cardImage" />
+                    </span>
+                  ) : (
+                    <span className="ccs-cardLabel">{c.label}</span>
+                  )}
                 </button>
               </li>
             );
           })}
         </ul>
-
-        <div className="ccs-actions" aria-label="Slider controls">
-          <button type="button" className="ccs-navBtn" onClick={handlePrev} aria-label="Previous">
-            ←
-          </button>
-          <button type="button" className="ccs-navBtn" onClick={handleNext} aria-label="Next">
-            →
-          </button>
-        </div>
+        <button type="button" className="ccs-navBtn" onClick={handleNext} aria-label="Next">
+          →
+        </button>
       </div>
-
-      <div ref={proxyRef} className="ccs-dragProxy" aria-hidden="true" />
     </div>
   );
 }

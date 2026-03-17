@@ -15,15 +15,10 @@
     "ejs": "^3.1.10",
     "express": "^4.21.0",
     "express-ejs-layouts": "^2.5.1",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
     "better-sqlite3": "^12.8.0",
-    "dotenv": "^16.6.1",
-    "ejs": "^3.1.10",
-    "express": "^4.21.0",
-    "express-ejs-layouts": "^2.5.1",
     "gsap": "^3.12.5",
     "next": "latest",
-    "pg": "^8.13.0",
     "react": "latest",
     "react-dom": "latest"
   },

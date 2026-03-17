@@ -80,7 +80,7 @@ export default function CookieForecast({ label, prediction }: Props) {
 
       <style jsx>{`
         .cookie-forecast-wrapper {
-          margin-top: 1.5rem;
+          margin-top: 0;
         }
 
         .cookie-viewport {
@@ -110,6 +110,7 @@ export default function CookieForecast({ label, prediction }: Props) {
 
         .cookie-asset-2 {
           cursor: pointer;
+          margin-top: 4%; /* nudge cookie slightly downward */
           filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.2));
           transition: transform 0.25s ease, filter 0.25s ease, opacity 0.2s ease;
         }
@@ -130,7 +131,7 @@ export default function CookieForecast({ label, prediction }: Props) {
 
         .cookie-click-hint {
           position: absolute;
-          top: 8%;
+          top: 110%;
           left: 50%;
           transform: translateX(-50%);
           padding: 0.4rem 0.9rem;
