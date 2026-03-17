@@ -76,6 +76,12 @@ export default function CategoryCardSlider({ categories, selectedValue, onSelect
   const proxyRef = useRef<HTMLDivElement | null>(null);
   const scrollToOffsetRef = useRef<((offset: number) => void) | null>(null);
   const currentOffsetRef = useRef(0);
+  const categoriesRef = useRef(categories);
+  const onSelectRef = useRef(onSelect);
+  const lastSelectedRef = useRef<string | null>(null);
+
+  categoriesRef.current = categories;
+  onSelectRef.current = onSelect;
 
   // Duplicate the list once so the loop feels richer with only 5 cards.
   const loopCategories = useMemo(() => [...categories, ...categories], [categories]);
@@ -126,6 +132,31 @@ export default function CategoryCardSlider({ categories, selectedValue, onSelect
         onUpdate() {
           seamlessLoop.time(wrapTime(playhead.offset));
           currentOffsetRef.current = playhead.offset;
+          // Find the visually largest card and mark it as selected.
+          let maxScale = -Infinity;
+          let maxIndex = 0;
+          cards.forEach((card, index) => {
+            const s = Number(gsap.getProperty(card, 'scale') || 0);
+            if (s > maxScale) {
+              maxScale = s;
+              maxIndex = index;
+            }
+          });
+
+          cards.forEach((card, index) => {
+            card.classList.toggle('ccs-card--selected', index === maxIndex);
+          });
+
+          const baseCategories = categoriesRef.current;
+          const selectCb = onSelectRef.current;
+          if (baseCategories && baseCategories.length > 0 && selectCb) {
+            const logicalIndex = maxIndex % baseCategories.length;
+            const nextValue = baseCategories[logicalIndex]?.value;
+            if (nextValue && nextValue !== lastSelectedRef.current) {
+              lastSelectedRef.current = nextValue;
+              selectCb(nextValue);
+            }
+          }
         },
         duration: 0.45,
         ease: 'power3',
@@ -171,13 +202,12 @@ export default function CategoryCardSlider({ categories, selectedValue, onSelect
       <div className="ccs-gallery" role="group" aria-roledescription="carousel">
         <ul className="ccs-cards" aria-label="Categories">
           {loopCategories.map((c, idx) => {
-            const isSelected = selectedValue === c.value;
             const fallbackAccent = defaultAccents[idx % defaultAccents.length];
             return (
               <li
                 key={`${c.value}-${idx}`}
                 data-value={c.value}
-                className={`ccs-card ${isSelected ? 'ccs-card--selected' : ''}`}
+                className="ccs-card"
                 style={
                   {
                     // CSS custom props so styling stays in CSS.
@@ -189,7 +219,7 @@ export default function CategoryCardSlider({ categories, selectedValue, onSelect
                   type="button"
                   className="ccs-cardButton"
                   onClick={() => onSelect(c.value)}
-                  aria-pressed={isSelected}
+                  aria-pressed={selectedValue === c.value}
                 >
                   <span className="ccs-cardLabel">{c.label}</span>
                   {c.description ? <span className="ccs-cardDesc">{c.description}</span> : null}
