@@ -1,9 +1,11 @@
 import Image from "next/image";
-import { getMonthsFromSupabase } from "@/lib/db";
+import { getMonths } from "@/lib/db";
 import LandingSentence from "./components/LandingSentence";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
-    const months = await getMonthsFromSupabase();
+    const months = await getMonths();
     return (
         <main className='min-h-screen flex flex-col items-center justify-center px-4'>
             <div className='w-full max-w-2xl'>

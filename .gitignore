@@ -6,3 +6,4 @@ database/horoscope.db
 *.log
 .next
 out
+.vercel
