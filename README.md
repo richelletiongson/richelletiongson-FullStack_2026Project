@@ -78,9 +78,26 @@ A modern full-stack horoscope application built with **Next.js**, **TypeScript**
 - ✅ Database connection troubleshooting & error handling
 - ✅ Documentation and setup instructions
 
-### [Team Member 2 Name] - [Role]
+### Richelle Tiongson - Full Stack/Front-End Developer
+• ✅ Structured and integrated horoscope data into database:
+ ◦ Formatted horoscope content into SQL structure
+ ◦ Populated zodiac_predictions_2026 (Aries–Pisces, March–December, all categories)
 
-- [List specific tasks and contributions]
+• ✅ Built fortune cookie animation & interaction:
+ ◦ Developed click-to-reveal cookie experience
+ ◦ Integrated animation using /public/images/asset-1.png and asset-2.png
+
+• ✅ Designed and implemented forecast/result page:
+ ◦ Styled initial UI and layout for forecast experience
+ ◦ Refined visual design and interaction flow
+
+• ✅ UX improvements and interaction polish:
+ ◦ Improved animation effects (radial light, timing, visibility)
+ ◦ Ensured clear, unobstructed cookie interaction
+ ◦ Optimized mobile layout and responsiveness
+
+• ✅ Product quality and iteration:
+ ◦ Refined micro-interactions and transitions as well as improve usability
 
 ### [Team Member 3 Name] - [Role]
 
