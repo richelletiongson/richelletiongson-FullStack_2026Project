@@ -1,55 +1,41 @@
 /**
  * PostgreSQL connection and queries for Horoscope 2026.
- * Uses pg Pool; set DATABASE_URL in .env (Supabase: URI with ?sslmode=require).
+ * Uses pg Pool; set DATABASE_URL in .env.
  */
 require("dotenv").config();
 const { Pool } = require("pg");
 
-function getConnectionString() {
-    return (
+function getPgConfig() {
+    const connectionString =
         process.env.DATABASE_URL ||
         process.env.POSTGRES_URL ||
-        "postgresql://postgres:@localhost:5432/horoscope2026"
-    );
-}
-
-function isLocalDatabase(connectionString) {
+        "postgresql://postgres:@localhost:5432/horoscope2026";
     try {
-        const u = new URL(
-            connectionString.replace(/^postgres(ql)?:\/\//i, "http://"),
-        );
-        return u.hostname === "localhost" || u.hostname === "127.0.0.1";
+        const url = new URL(connectionString);
+        const config = {
+            host: url.hostname,
+            port: url.port || 5432,
+            user: url.username || "postgres",
+            password: url.password !== undefined ? url.password : "",
+            database: url.pathname.slice(1) || "horoscope2026",
+        };
+        return config;
     } catch {
-        return false;
+        return { connectionString };
     }
 }
 
-function stripSslQueryParams(connectionString) {
-    const q = connectionString.indexOf("?");
-    if (q === -1) return connectionString;
-    const base = connectionString.slice(0, q);
-    const params = new URLSearchParams(connectionString.slice(q + 1));
-    params.delete("sslmode");
-    params.delete("ssl");
-    const rest = params.toString();
-    return rest ? `${base}?${rest}` : base;
-}
-
-const _conn = getConnectionString();
-const _local = isLocalDatabase(_conn);
-const pool = new Pool(
-    _local
-        ? { connectionString: _conn }
-        : {
-              connectionString: stripSslQueryParams(_conn),
-              ssl: { rejectUnauthorized: false },
-          },
-);
+const config = getPgConfig();
+if (config.password === undefined) config.password = "";
+const pool = new Pool(config);
 
 function getPool() {
     return pool;
 }
 
+/**
+ * @returns {Promise<Array<{ month_id: number, name: string }>>}
+ */
 async function getMonths() {
     const result = await pool.query(
         "SELECT month_id, name FROM months ORDER BY month_id",
@@ -57,6 +43,12 @@ async function getMonths() {
     return result.rows;
 }
 
+/**
+ * @param {string} sign
+ * @param {number} monthId
+ * @param {string} category
+ * @returns {Promise<{ id, sign, month_id, category, prediction } | null>}
+ */
 async function getPrediction(sign, monthId, category) {
     const result = await pool.query(
         `SELECT id, sign, month_id, category, prediction FROM zodiac_predictions_2026
@@ -66,6 +58,11 @@ async function getPrediction(sign, monthId, category) {
     return result.rows[0] || null;
 }
 
+/**
+ * @param {string} sign
+ * @param {number | null} monthId - if null, returns all months for sign
+ * @returns {Promise<Array<{ id, sign, month_id, category, prediction }>>}
+ */
 async function getPredictionsForSignMonth(sign, monthId) {
     if (monthId !== null && monthId !== undefined) {
         const result = await pool.query(

@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getMonths } from '@/lib/db';
-import { getPredictionsForSignMonth } from './actions';
+import { getMonths, getPredictionsForSignMonth } from '@/lib/db';
 
 const CATEGORIES = ['Love', 'Money', 'Career', 'Family', 'Health'] as const;
 const CATEGORY_LABELS: Record<string, string> = {

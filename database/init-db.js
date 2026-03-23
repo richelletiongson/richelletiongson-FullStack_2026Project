@@ -2,6 +2,7 @@
 /**
  * Initialize PostgreSQL: run schema and load seed data.
  * Requires DATABASE_URL in .env (or env). Run: npm run db:init
+ * Supabase: use the pooled connection URI from the dashboard (?sslmode=require).
  */
 require('dotenv').config();
 const fs = require('fs');
@@ -16,38 +17,51 @@ const seedFiles = [
   'seed_water_signs.sql',
 ];
 
-function getPgConfig() {
-  const connectionString =
+function getConnectionString() {
+  return (
     process.env.DATABASE_URL ||
     process.env.POSTGRES_URL ||
-    'postgresql://postgres:postgres@localhost:5432/horoscope2026';
+    'postgresql://postgres:postgres@localhost:5432/horoscope2026'
+  );
+}
+
+function isLocalDatabase(connectionString) {
   try {
-    const url = new URL(connectionString);
-    return {
-      host: url.hostname,
-      port: Number(url.port) || 5432,
-      user: url.username || 'postgres',
-      password: url.password !== undefined ? url.password : (process.env.PGPASSWORD ?? 'postgres'),
-      database: (url.pathname.slice(1) || 'horoscope2026').replace(/%2F/gi, '/'),
-    };
+    const u = new URL(
+      connectionString.replace(/^postgres(ql)?:\/\//i, 'http://')
+    );
+    return u.hostname === 'localhost' || u.hostname === '127.0.0.1';
   } catch {
-    return { connectionString };
+    return false;
   }
 }
 
+function stripSslQueryParams(connectionString) {
+  const q = connectionString.indexOf('?');
+  if (q === -1) return connectionString;
+  const base = connectionString.slice(0, q);
+  const params = new URLSearchParams(connectionString.slice(q + 1));
+  params.delete('sslmode');
+  params.delete('ssl');
+  const rest = params.toString();
+  return rest ? `${base}?${rest}` : base;
+}
+
 async function init() {
-  const config = getPgConfig();
-  if (config.connectionString) {
-    const client = new Client({ connectionString: config.connectionString });
-    await runInit(client);
-    return;
-  }
-  const client = new Client(config);
+  const raw = getConnectionString();
+  const local = isLocalDatabase(raw);
+  const client = new Client(
+    local
+      ? { connectionString: raw }
+      : {
+          connectionString: stripSslQueryParams(raw),
+          ssl: { rejectUnauthorized: false },
+        }
+  );
   await runInit(client);
 }
 
 async function runInit(client) {
-
   try {
     await client.connect();
   } catch (e) {

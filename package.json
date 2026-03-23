@@ -16,7 +16,6 @@
     "express": "^4.21.0",
     "express-ejs-layouts": "^2.5.1",
     "pg": "^8.20.0",
-    "better-sqlite3": "^12.8.0",
     "gsap": "^3.12.5",
     "next": "latest",
     "react": "latest",

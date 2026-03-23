@@ -1,17 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { getDistinctSigns } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const db = getDb();
-    const rows = db
-      .prepare(
-        'SELECT DISTINCT sign FROM zodiac_predictions_2026 ORDER BY sign'
-      )
-      .all() as { sign: string }[];
-    return NextResponse.json(rows.map((r) => r.sign));
+    const signs = await getDistinctSigns();
+    return NextResponse.json(signs);
   } catch (e) {
     console.error(e);
     return NextResponse.json(

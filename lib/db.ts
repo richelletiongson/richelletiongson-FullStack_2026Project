@@ -1,16 +1,4 @@
-import path from 'path';
-import Database from 'better-sqlite3';
-
-const dbPath = path.join(process.cwd(), 'database', 'horoscope.db');
-
-let db: Database.Database | null = null;
-
-export function getDb(): Database.Database {
-  if (!db) {
-    db = new Database(dbPath, { readonly: true });
-  }
-  return db;
-}
+import { Pool } from 'pg';
 
 export type Prediction = {
   id: number;
@@ -23,22 +11,106 @@ export type Prediction = {
 
 export type Month = { month_id: number; name: string };
 
-export function getMonths(): Month[] {
-  const db = getDb();
-  return db.prepare('SELECT month_id, name FROM months ORDER BY month_id').all() as Month[];
+function getConnectionString(): string {
+  return (
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    'postgresql://postgres:@localhost:5432/horoscope2026'
+  );
 }
 
-export function getPrediction(
+/** Hosts other than localhost use TLS; relax chain verify for cloud DBs (fixes Supabase / some proxies). */
+function isLocalDatabase(connectionString: string): boolean {
+  try {
+    const u = new URL(
+      connectionString.replace(/^postgres(ql)?:\/\//i, 'http://')
+    );
+    return u.hostname === 'localhost' || u.hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Query sslmode=require is currently treated like verify-full in node-pg and can ignore
+ * rejectUnauthorized: false. Strip ssl-related params and set ssl on the Pool instead.
+ */
+function stripSslQueryParams(connectionString: string): string {
+  const q = connectionString.indexOf('?');
+  if (q === -1) return connectionString;
+  const base = connectionString.slice(0, q);
+  const params = new URLSearchParams(connectionString.slice(q + 1));
+  params.delete('sslmode');
+  params.delete('ssl');
+  const rest = params.toString();
+  return rest ? `${base}?${rest}` : base;
+}
+
+let pool: Pool | null = null;
+
+function getPool(): Pool {
+  if (!pool) {
+    const raw = getConnectionString();
+    const local = isLocalDatabase(raw);
+    pool = new Pool(
+      local
+        ? {
+            connectionString: raw,
+            max: Number(process.env.PGPOOL_MAX) || 10,
+          }
+        : {
+            connectionString: stripSslQueryParams(raw),
+            max: Number(process.env.PGPOOL_MAX) || 10,
+            ssl: { rejectUnauthorized: false },
+          }
+    );
+  }
+  return pool;
+}
+
+export async function getMonths(): Promise<Month[]> {
+  const result = await getPool().query(
+    'SELECT month_id, name FROM months ORDER BY month_id'
+  );
+  return result.rows;
+}
+
+export async function getPrediction(
   sign: string,
   monthId: number,
   category: string
-): Prediction | null {
-  const db = getDb();
-  const row = db
-    .prepare(
-      `SELECT id, sign, month_id, category, prediction FROM zodiac_predictions_2026 
-       WHERE sign = ? AND month_id = ? AND category = ?`
-    )
-    .get(sign, monthId, category);
-  return (row as Prediction) ?? null;
+): Promise<Prediction | null> {
+  const result = await getPool().query(
+    `SELECT id, sign, month_id, category, prediction FROM zodiac_predictions_2026
+     WHERE sign = $1 AND month_id = $2 AND category = $3`,
+    [sign, monthId, category]
+  );
+  return result.rows[0] ?? null;
+}
+
+export async function getPredictionsForSignMonth(
+  sign: string,
+  monthId: number | null
+): Promise<Prediction[]> {
+  if (monthId !== null && monthId !== undefined) {
+    const result = await getPool().query(
+      `SELECT id, sign, month_id, category, prediction FROM zodiac_predictions_2026
+       WHERE sign = $1 AND month_id = $2 ORDER BY category`,
+      [sign, monthId]
+    );
+    return result.rows;
+  }
+  const result = await getPool().query(
+    `SELECT id, sign, month_id, category, prediction FROM zodiac_predictions_2026
+     WHERE sign = $1 ORDER BY month_id, category`,
+    [sign]
+  );
+  return result.rows;
+}
+
+export async function getDistinctSigns(): Promise<string[]> {
+  const result = await getPool().query(
+    'SELECT DISTINCT sign FROM zodiac_predictions_2026 ORDER BY sign'
+  );
+  return result.rows.map((row: { sign: string }) => row.sign);
 }

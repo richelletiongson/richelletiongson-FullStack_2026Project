@@ -1,6 +1,8 @@
 node_modules/
 database/horoscope.db
 .env
+.env.local
+.env*.local
 *.log
 .next
 out
