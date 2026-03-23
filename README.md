@@ -99,9 +99,27 @@ A modern full-stack horoscope application built with **Next.js**, **TypeScript**
 - ✅ Product quality and iteration:
     - Refined micro-interactions and transitions as well as improve usability
 
-### [Team Member 3 Name] - [Role]
+### Bonnie Wan (Member 3) - Front-End Developer
 
-- [List specific tasks and contributions]
+**Completed Tasks:**
+
+- ✅ Designed and implemented the **Logo** on the main landing page
+  - Updated `app/page.tsx` to display `public/images/Logo_LunarCookie.png`
+- ✅ Built the **Category Card UI (visual design)**
+  - Implemented card styling and layout in `app/globals.css`
+  - Replaced card content with category PNG assets:
+    - `Love.png`, `Money.png`, `Career.png`, `Family.png`, `Health.png`
+  - Ensured cards remain clickable and visually indicate the currently selected option
+- ✅ Implemented the **Main page experience end-to-end**
+  - Worked on sign selection + category selection integration
+  - Connected carousel selection to the form submit payload (hidden `category` input)
+- ✅ Designed and implemented the **Carousel + How It Works**
+  - Implemented the carousel component in `app/components/CategoryCardSlider.tsx`
+  - How it works:
+    - `LandingSentence.tsx` stores the current selected `category` via `useState`
+    - The carousel receives `selectedValue` and updates it through `onSelect`
+    - Clicking `← / →` changes the selected category, then centers that card using `ref` + `scrollIntoView({ inline: 'center' })`
+    - Cards are laid out in a horizontally scrollable container using **scroll-snap**, so the selected card is easy to spot
 
 ### [Team Member 4 Name] - [Role]
 
