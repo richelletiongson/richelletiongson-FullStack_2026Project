@@ -59,19 +59,30 @@ function stripSslQueryParams(connectionString: string): string {
 
 let pool: Pool | null = null;
 
+/** Vercel serverless: keep pool tiny to avoid exhausting Supabase connection limits. */
+function getPoolMax(): number {
+    if (process.env.PGPOOL_MAX) {
+        return Number(process.env.PGPOOL_MAX);
+    }
+    return process.env.VERCEL ? 1 : 10;
+}
+
 function getPool(): Pool {
     if (!pool) {
         const raw = getConnectionString();
         const local = isLocalDatabase(raw);
+        const max = getPoolMax();
         pool = new Pool(
             local
                 ? {
                       connectionString: raw,
-                      max: Number(process.env.PGPOOL_MAX) || 10,
+                      max,
+                      connectionTimeoutMillis: 15_000,
                   }
                 : {
                       connectionString: stripSslQueryParams(raw),
-                      max: Number(process.env.PGPOOL_MAX) || 10,
+                      max,
+                      connectionTimeoutMillis: 15_000,
                       ssl: { rejectUnauthorized: false },
                   },
         );
