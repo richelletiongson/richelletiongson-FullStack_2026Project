@@ -17,17 +17,32 @@ export type Prediction = {
 
 export type Month = { month_id: number; name: string };
 
+/**
+ * Fix common paste mistakes from Vercel/Supabase UI (extra ?, quotes, whitespace).
+ */
+function normalizeConnectionString(raw: string): string {
+    let s = raw.trim();
+    if (
+        (s.startsWith('"') && s.endsWith('"')) ||
+        (s.startsWith("'") && s.endsWith("'"))
+    ) {
+        s = s.slice(1, -1).trim();
+    }
+    // Typo breaks DNS: postgres?://  →  postgres://
+    s = s.replace(/^postgres\?:(\/\/)/i, "postgres:$1");
+    s = s.replace(/^postgresql\?:(\/\/)/i, "postgresql:$1");
+    return s;
+}
+
 function getConnectionString(): string {
-    // Read from environment variables only
     const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
 
     if (!url) {
-        // This will show up clearly in your Vercel logs if the key is missing
         throw new Error(
             "Deployment Failed: DATABASE_URL not found in environment variables.",
         );
     }
-    return url;
+    return normalizeConnectionString(url);
 }
 
 /** Hosts other than localhost use TLS; relax chain verify for cloud DBs (fixes Supabase / some proxies). */
