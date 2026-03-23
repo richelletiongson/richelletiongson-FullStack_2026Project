@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { createClient } from "@supabase/supabase-js";
+import { getSupabasePublishableKey, getSupabaseUrl } from "./supabase-env";
 
 export type Prediction = {
     id: number;
@@ -77,10 +78,7 @@ export async function getMonths(): Promise<Month[]> {
 }
 
 export async function getMonthsFromSupabase(): Promise<Month[]> {
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "",
-    );
+    const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     const { data, error } = await supabase
         .from("months")
@@ -113,10 +111,7 @@ export async function getPredictionFromSupabase(
     monthId: number,
     category: string,
 ): Promise<Prediction | null> {
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "",
-    );
+    const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     const { data, error } = await supabase
         .from("zodiac_predictions_2026")
@@ -158,10 +153,7 @@ export async function getPredictionsForSignMonthFromSupabase(
     sign: string,
     monthId: number | null,
 ): Promise<Prediction[]> {
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "",
-    );
+    const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     let query = supabase
         .from("zodiac_predictions_2026")
@@ -196,10 +188,7 @@ export async function getDistinctSigns(): Promise<string[]> {
 }
 
 export async function getDistinctSignsFromSupabase(): Promise<string[]> {
-    const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY || "",
-    );
+    const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     const { data, error } = await supabase
         .from("zodiac_predictions_2026")
