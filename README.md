@@ -121,9 +121,28 @@ A modern full-stack horoscope application built with **Next.js**, **TypeScript**
     - Clicking `← / →` changes the selected category, then centers that card using `ref` + `scrollIntoView({ inline: 'center' })`
     - Cards are laid out in a horizontally scrollable container using **scroll-snap**, so the selected card is easy to spot
 
-### [Team Member 4 Name] - [Role]
+### [Xiuzi Guo] - [Full-Stack Developer]
 
-- [List specific tasks and contributions]
+- ✅ **Product Direction & Content Planning**
+Defined the overall website concept, including content scope, data structure, and user-facing direction. Ensured alignment between user needs and the astrology-based content strategy.
+
+- ✅ **Data Collection & Processing**
+Extracted and curated relevant content from Astrology Zone, transforming unstructured text into structured datasets suitable for application use.
+
+- ✅ **Database Design (PostgreSQL)**
+Organized and normalized collected data into a PostgreSQL schema. Designed tables and relationships to support scalability, efficient querying, and future feature expansion.
+
+- ✅ **Frontend Development**
+Built the initial interface and core pages using modern frontend practices. Designed and implemented basic CSS styling to ensure usability, readability, and a clean user experience.
+
+- ✅ **Cloud Integration (Supabase & Vercel)**
+Connected the backend database (Supabase) with the frontend deployment (Vercel). Configured secure environment variables and optimized database connection settings for production.
+
+- ✅ **Deployment & Debugging**
+Led the deployment process and identified critical issues preventing successful builds. Troubleshot configuration errors and ensured the application was production-ready.
+
+- ✅ **Documentation & Reporting**
+Contributed to the project report by documenting technical decisions, system architecture, and development challenges, with a focus on clarity and reproducibility.
 
 ---
 
