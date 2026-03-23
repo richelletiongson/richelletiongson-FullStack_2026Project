@@ -14,3 +14,8 @@ export function getSupabasePublishableKey(): string {
         ""
     );
 }
+
+/** True when @supabase/supabase-js can be constructed (Vercel may only set DATABASE_URL). */
+export function isSupabaseJsConfigured(): boolean {
+    return Boolean(getSupabaseUrl().trim() && getSupabasePublishableKey().trim());
+}

@@ -1,6 +1,10 @@
 import { Pool } from "pg";
 import { createClient } from "@supabase/supabase-js";
-import { getSupabasePublishableKey, getSupabaseUrl } from "./supabase-env";
+import {
+    getSupabasePublishableKey,
+    getSupabaseUrl,
+    isSupabaseJsConfigured,
+} from "./supabase-env";
 
 export type Prediction = {
     id: number;
@@ -78,6 +82,9 @@ export async function getMonths(): Promise<Month[]> {
 }
 
 export async function getMonthsFromSupabase(): Promise<Month[]> {
+    if (!isSupabaseJsConfigured()) {
+        return getMonths();
+    }
     const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     const { data, error } = await supabase
@@ -111,6 +118,9 @@ export async function getPredictionFromSupabase(
     monthId: number,
     category: string,
 ): Promise<Prediction | null> {
+    if (!isSupabaseJsConfigured()) {
+        return getPrediction(sign, monthId, category);
+    }
     const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     const { data, error } = await supabase
@@ -153,6 +163,9 @@ export async function getPredictionsForSignMonthFromSupabase(
     sign: string,
     monthId: number | null,
 ): Promise<Prediction[]> {
+    if (!isSupabaseJsConfigured()) {
+        return getPredictionsForSignMonth(sign, monthId);
+    }
     const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     let query = supabase
@@ -188,6 +201,9 @@ export async function getDistinctSigns(): Promise<string[]> {
 }
 
 export async function getDistinctSignsFromSupabase(): Promise<string[]> {
+    if (!isSupabaseJsConfigured()) {
+        return getDistinctSigns();
+    }
     const supabase = createClient(getSupabaseUrl(), getSupabasePublishableKey());
 
     const { data, error } = await supabase

@@ -1,6 +1,8 @@
 import { getMonthsFromSupabase, getPredictionFromSupabase } from "@/lib/db";
 import CookieForecast from "@/app/components/CookieForecast";
 
+export const dynamic = "force-dynamic";
+
 // Shared class for the back-link appearance / hover / focus behavior
 const backLinkClass =
     "inline-block py-2 pr-2 text-[var(--text-muted)] hover:text-[var(--accent)] focus:text-[var(--accent)] focus:outline-none cursor-pointer";

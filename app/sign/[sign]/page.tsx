@@ -4,6 +4,8 @@ import {
     getPredictionsForSignMonthFromSupabase,
 } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 const CATEGORIES = ["Love", "Money", "Career", "Family", "Health"] as const;
 const CATEGORY_LABELS: Record<string, string> = {
     Love: "Love",
